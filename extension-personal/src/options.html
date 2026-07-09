@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>North Star — Settings</title>
+  <link rel="stylesheet" href="popup.css" />
+  <style>
+    body { width: 520px; }
+    h1 { font-size: 17px; margin: 0 0 4px; }
+    .sub { color: var(--faint); font-size: 12px; margin: 0 0 18px; }
+    label { display: block; font-size: 12px; color: var(--dim); margin: 14px 0 6px; font-weight: 500; }
+    textarea, input[type="text"] {
+      width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 11px; font-size: 13px; font-family: ui-monospace, Menlo, monospace;
+    }
+    textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); }
+    .toggle { display: flex; align-items: center; gap: 9px; margin-top: 16px; }
+    .toggle input { width: auto; }
+    .hint { color: var(--faint); font-size: 11px; margin-top: 5px; }
+    #saved { color: var(--low); font-size: 12px; margin-left: 10px; }
+
+    /* Rule rows */
+    .rule { display: grid; grid-template-columns: 1fr 118px 116px 30px; gap: 7px; align-items: center; margin-bottom: 7px; }
+    .rule select {
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 8px; font-size: 12px;
+    }
+    .rule .r-del { background: transparent; border: 1px solid var(--border); color: var(--faint);
+      border-radius: 8px; padding: 8px 0; cursor: pointer; font-size: 12px; }
+    .rule .r-del:hover { color: var(--crit); border-color: var(--crit); }
+    .rule input[type="text"] { padding: 8px 10px; }
+    .rule.head { color: var(--faint); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .rule.head span { padding-left: 2px; }
+    /* colour-code the action pill */
+    select.a-redact { color: #c084fc; border-color: color-mix(in srgb, #c084fc 45%, var(--border)); }
+    select.a-highlight { color: var(--high); }
+
+    .rowbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+    .legend { display: flex; gap: 16px; font-size: 11px; color: var(--faint); margin: 10px 0 4px; }
+    .legend b { font-weight: 600; }
+    .legend .hl { color: var(--high); } .legend .rd { color: #c084fc; }
+    .testout .badge { font-size: 10px; padding: 1px 6px; border-radius: 999px; margin-left: 4px; }
+    .testout .badge.rd { background: color-mix(in srgb,#c084fc 18%,transparent); color: #c084fc; }
+    .testout .badge.hl { background: color-mix(in srgb,var(--high) 18%,transparent); color: var(--high); }
+  </style>
+</head>
+<body>
+  <h1>North Star — Settings</h1>
+  <p class="sub">Everything runs 100% locally in your browser. Nothing is ever sent anywhere.</p>
+
+  <h1 style="font-size:14px;margin:22px 0 2px;">Protection</h1>
+  <div class="toggle">
+    <input type="checkbox" id="typeGuard" />
+    <label for="typeGuard" style="margin: 0;">Warn me while typing (real-time guard for any text box, incl. AI chatbots)</label>
+  </div>
+  <div class="toggle">
+    <input type="checkbox" id="blockSend" />
+    <label for="blockSend" style="margin: 0;">Block Enter/send while sensitive data is present (stricter)</label>
+  </div>
+  <div class="toggle">
+    <input type="checkbox" id="autoScan" />
+    <label for="autoScan" style="margin: 0;">Auto-scan whole pages as they load</label>
+  </div>
+
+  <h1 style="font-size:14px;margin:26px 0 2px;">Your sensitive rules</h1>
+  <p class="sub" style="margin:0 0 6px;">Add your own words. For each one, choose what should happen when it's found. Stays on your device.</p>
+  <div class="legend">
+    <span><b class="hl">Highlight</b> — just warn me (I decide)</span>
+    <span><b class="rd">Mask &amp; redact</b> — auto-hide the value on send</span>
+  </div>
+
+  <div class="rule head">
+    <span>Word / label / pattern</span><span>Match as</span><span>When found</span><span></span>
+  </div>
+  <div id="rules"></div>
+
+  <div class="rowbtns">
+    <button id="addRule" class="ghost" style="width:auto;padding:8px 14px">＋ Add rule</button>
+    <span style="color:var(--faint);font-size:11px">or apply a starter pack:</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px" id="packs">
+    <button class="ghost pack" data-pack="general" style="width:auto;padding:6px 12px">🏢 General</button>
+    <button class="ghost pack" data-pack="dev" style="width:auto;padding:6px 12px">💻 Dev</button>
+    <button class="ghost pack" data-pack="finance" style="width:auto;padding:6px 12px">💰 Finance</button>
+    <button class="ghost pack" data-pack="healthcare" style="width:auto;padding:6px 12px">🏥 Healthcare</button>
+  </div>
+
+  <div style="margin-top: 20px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <button id="save" class="primary" style="width: auto; padding: 9px 20px;">Save</button>
+    <button id="export" class="ghost" style="width:auto;padding:9px 14px">⬇ Export</button>
+    <button id="importBtn" class="ghost" style="width:auto;padding:9px 14px">⬆ Import</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+    <span id="saved"></span>
+  </div>
+
+  <h1 style="font-size:14px;margin:26px 0 2px;">Sites where North Star is off</h1>
+  <p class="sub" style="margin:0 0 8px;">One hostname per line (e.g. <code>youtube.com</code>). North Star won't scan or warn on these sites — subdomains are included. You can also toggle the current site from the toolbar popup.</p>
+  <textarea id="disabledSites" rows="3" placeholder="youtube.com&#10;netflix.com"></textarea>
+
+  <label for="tester" style="margin-top:22px">Try it — paste text to test your rules</label>
+  <textarea id="tester" rows="3" placeholder="Paste sample text here…"></textarea>
+  <div id="testout" class="hint testout"></div>
+
+  <script src="engine.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

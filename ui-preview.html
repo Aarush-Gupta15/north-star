@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>North Star — UI Preview</title>
+<style>
+  :root {
+    --bg:#0b0d12; --bg-elev:#12151c; --bg-elev-2:#181c25; --border:#232936;
+    --text:#e6e9ef; --text-dim:#9aa4b2; --text-faint:#6b7280;
+    --accent:#6366f1; --accent-hover:#7c7ff2; --ring:rgba(99,102,241,.4);
+    --risk-low:#22c55e; --risk-medium:#eab308; --risk-high:#f97316; --risk-critical:#ef4444;
+    --radius:12px; --radius-sm:8px; --shadow:0 8px 30px rgba(0,0,0,.35);
+    --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  [data-theme="light"]{
+    --bg:#f7f8fa; --bg-elev:#fff; --bg-elev-2:#f0f2f6; --border:#e3e6ec;
+    --text:#11131a; --text-dim:#54607a; --text-faint:#8a93a6; --shadow:0 8px 30px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--accent);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:var(--radius-sm);padding:10px 16px;font-weight:600;font-size:14px;transition:background .15s,transform .05s}
+  button:active{transform:translateY(1px)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover:not(:disabled){background:var(--accent-hover)}
+  .btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border)}
+  .btn-ghost:hover:not(:disabled){color:var(--text);border-color:var(--text-faint)}
+  input,textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;font-family:inherit;font-size:14px;transition:border-color .15s,box-shadow .15s}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  textarea{resize:vertical;min-height:170px;font-family:var(--mono);font-size:13px}
+  label{display:block;font-size:13px;color:var(--text-dim);margin-bottom:6px;font-weight:500}
+  .card{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+  .app-shell{min-height:100%;display:flex;flex-direction:column}
+  .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg-elev) 80%,transparent);position:sticky;top:0;backdrop-filter:blur(8px);z-index:10}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .nav-user{color:var(--text-dim);font-size:13px}
+  .container{width:100%;max-width:1040px;margin:0 auto;padding:32px 24px}
+  .auth-center{flex:1;display:grid;place-items:center;padding:24px;min-height:100vh}
+  .auth-card{width:100%;max-width:400px}
+  .stack{display:flex;flex-direction:column;gap:16px}
+  .row{display:flex;gap:12px;align-items:center}
+  .between{justify-content:space-between}
+  .grid-2{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+  @media(max-width:820px){.grid-2{grid-template-columns:1fr}}
+  h1{font-size:22px;margin:0 0 4px;letter-spacing:-.02em}
+  h2{font-size:15px;margin:0 0 12px;letter-spacing:-.01em}
+  .subtitle{color:var(--text-dim);font-size:14px;margin:0 0 24px}
+  .muted{color:var(--text-faint);font-size:13px}
+  .error-text{color:var(--risk-critical);font-size:13px;margin-top:4px}
+  .score-num{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}
+  .score-cap{font-size:12px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+  .risk-low{color:var(--risk-low);background:color-mix(in srgb,var(--risk-low) 14%,transparent)}
+  .risk-medium{color:var(--risk-medium);background:color-mix(in srgb,var(--risk-medium) 14%,transparent)}
+  .risk-high{color:var(--risk-high);background:color-mix(in srgb,var(--risk-high) 14%,transparent)}
+  .risk-critical{color:var(--risk-critical);background:color-mix(in srgb,var(--risk-critical) 14%,transparent)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:var(--mono);font-size:12px;padding:4px 9px;border-radius:6px;background:var(--bg-elev-2);border:1px solid var(--border);color:var(--text-dim)}
+  .chip b{color:var(--text)}
+  .redacted{font-family:var(--mono);font-size:13px;white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text-dim);max-height:240px;overflow:auto}
+  .redacted mark{background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--accent-hover);border-radius:4px;padding:0 3px;font-weight:600}
+  .explanation{color:var(--text-dim);font-size:14px;line-height:1.6}
+  .fade-in{animation:fadeIn .25s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .spinner{width:16px;height:16px;border-radius:50%;border:2px solid color-mix(in srgb,#fff 30%,transparent);border-top-color:#fff;display:inline-block;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .nav-tabs{display:flex;gap:4px;background:var(--bg-elev-2);padding:4px;border-radius:10px}
+  .nav-tab{background:transparent;color:var(--text-dim);padding:6px 14px;font-size:13px;border-radius:7px}
+  .nav-tab:hover{color:var(--text)}
+  .nav-tab.active{background:var(--bg-elev);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:820px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat-card{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden}
+  .stat-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--text-faint)}
+  .stat-card.tone-good::before{background:var(--risk-low)}
+  .stat-card.tone-warn::before{background:var(--risk-medium)}
+  .stat-card.tone-bad::before{background:var(--risk-critical)}
+  .stat-label{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em}
+  .stat-value{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:6px;line-height:1}
+  .stat-sub{font-size:12px;color:var(--text-faint);margin-top:6px}
+  .bar-list{display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:grid;grid-template-columns:130px 1fr 32px;align-items:center;gap:10px}
+  .bar-label{font-family:var(--mono);font-size:12px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar-track{background:var(--bg-elev-2);border-radius:6px;height:10px;overflow:hidden}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hover));border-radius:6px;transition:width .4s}
+  .bar-count{font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+  .segbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--bg-elev-2)}
+  .segbar-seg{height:100%;transition:width .4s}
+  .risk-low-bg{background:var(--risk-low)}.risk-medium-bg{background:var(--risk-medium)}
+  .risk-high-bg{background:var(--risk-high)}.risk-critical-bg{background:var(--risk-critical)}
+  .trend-chart{width:100%;height:auto;display:block}
+  .trend-chart .grid-line{stroke:var(--border);stroke-width:1}
+  .trend-chart .axis-label{fill:var(--text-faint);font-size:10px;font-family:var(--mono)}
+  .trend-chart .vol-bar{fill:color-mix(in srgb,var(--text-faint) 35%,transparent)}
+  .trend-chart .risk-line{stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .trend-chart .risk-dot{fill:var(--accent-hover)}
+  .legend{display:flex;gap:18px;margin-top:10px}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim)}
+  .legend-swatch{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .swatch-line{background:var(--accent)}.swatch-bar{background:color-mix(in srgb,var(--text-faint) 35%,transparent)}
+  .preview-ribbon{position:fixed;bottom:14px;right:14px;background:var(--bg-elev-2);border:1px solid var(--border);color:var(--text-dim);font-size:11px;padding:6px 11px;border-radius:999px;z-index:50}
+  .preview-ribbon b{color:var(--accent-hover)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="preview-ribbon">North Star · <b>offline UI preview</b> — detection runs in your browser</div>
+
+<script>
+// ===========================================================================
+// Faithful client-side port of the backend so this preview really works.
+// (Mirrors app/services/pii/patterns.py, risk.py, explain.py.)
+// ===========================================================================
+
+// --- Verhoeff (Aadhaar checksum) ---
+const VD=[[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
+const VP=[[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
+function verhoeffValid(num){let c=0;const d=num.replace(/\D/g,'').split('').reverse();for(let i=0;i<d.length;i++){c=VD[c][VP[i%8][parseInt(d[i],10)]];}return c===0;}
+function luhnValid(num){const d=num.replace(/\D/g,'');if(d.length<12)return false;let sum=0,parity=d.length%2;for(let i=0;i<d.length;i++){let n=parseInt(d[i],10);if(i%2===parity){n*=2;if(n>9)n-=9;}sum+=n;}return sum%10===0;}
+function looksLikeSecret(t){if(t.length<6||t.length>64)return false;if(t.includes('://')||/@[\w.-]+\.[a-z]{2,}/i.test(t))return false;const lo=/[a-z]/.test(t),up=/[A-Z]/.test(t),di=/\d/.test(t);const hasLetter=lo||up;const classes=(lo?1:0)+(up?1:0)+(di?1:0)+(/[^A-Za-z0-9]/.test(t)?1:0);const sym=/[#@!$%^&*+=~?]/.test(t);if(sym&&hasLetter&&(di||t.length>=8))return true;if(classes>=4)return true;if(lo&&up&&di&&t.length>=12)return true;return false;}
+const CREDS=['PASSWORD','SECRET','PRIVATE_KEY','AWS_ACCESS_KEY','API_SECRET_KEY','GITHUB_TOKEN','GOOGLE_API_KEY','SLACK_TOKEN','JWT','OTP','PIN','CVV'];
+
+const PATTERNS=[
+  {type:'PRIVATE_KEY',conf:.99,re:/-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----/g},
+  {type:'AWS_ACCESS_KEY',conf:.97,re:/\bAKIA[0-9A-Z]{16}\b/g},
+  {type:'GITHUB_TOKEN',conf:.96,re:/\bgh[pousr]_[A-Za-z0-9]{36,}\b/g},
+  {type:'GOOGLE_API_KEY',conf:.95,re:/\bAIza[0-9A-Za-z_\-]{35}\b/g},
+  {type:'SLACK_TOKEN',conf:.94,re:/\bxox[baprs]-[0-9A-Za-z-]{10,}\b/g},
+  {type:'API_SECRET_KEY',conf:.9,re:/\bsk-[A-Za-z0-9]{20,}\b/g},
+  {type:'JWT',conf:.85,re:/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g},
+  {type:'PASSWORD',conf:.9,re:/\b(?:password|passwd|passphrase|pass\s?code|pwd|pass)\b\s*(?:is|was|:|=|->|-)?\s*(\S{4,})/gi,group:1},
+  {type:'SECRET',conf:.9,re:/\b(?:secret|api[\s_-]?key|access[\s_-]?token|client[\s_-]?secret)\b\s*(?:is|:|=|-)?\s*(\S{6,})/gi,group:1},
+  {type:'OTP',conf:.85,re:/\b(?:otp|one[\s-]?time\s?(?:password|code)|verification\s?code)\b\s*(?:is|:|=|-)?\s*(\d{4,8})\b/gi,group:1},
+  {type:'PIN',conf:.8,re:/\b(?:m-?pin|atm\s?pin|pin)\b\s*(?:is|:|=|-)?\s*(\d{3,6})\b/gi,group:1},
+  {type:'PASSWORD',conf:.72,re:/(?<!\S)\S{6,64}(?!\S)/g,validate:looksLikeSecret},
+  {type:'CREDIT_CARD',conf:.95,re:/(?<!\d)(?:\d[ -]?){12,18}\d(?!\d)/g,validate:luhnValid},
+  {type:'CVV',conf:.9,re:/\b(?:cvv|cvc|cvv2)\b\s*[:=-]?\s*(\d{3,4})\b/gi,group:1},
+  {type:'CVV',conf:.85,re:/\b(?:credit|debit|atm)[\s-]?card\b[^\n]{0,15}?\b(?:cv|security\s?code)\b\s*[:=-]?\s*(\d{3,4})\b/gi,group:1},
+  {type:'IN_AADHAAR',conf:.8,re:/\b(?:aadhaar|aadhar|uidai)\b(?:\s*(?:card|number|no\.?|#))?\s*[:=-]?\s*(\d[\d\s-]{5,17}\d)/gi,group:1},
+  {type:'IN_PAN',conf:.78,re:/\bpan\b(?:\s*(?:card|number|no\.?))?\s*[:=-]?\s*([A-Za-z0-9]{5,12})/gi,group:1},
+  {type:'CREDIT_CARD',conf:.8,re:/\b(?:credit|debit|atm)[\s-]?card\b(?:\s*(?:number|no\.?|#))?\s*[:=-]?\s*(\d[\d\s-]{5,20}\d)/gi,group:1},
+  {type:'IBAN',conf:.85,re:/\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/g},
+  {type:'IN_IFSC',conf:.8,re:/\b[A-Z]{4}0[A-Z0-9]{6}\b/g},
+  {type:'SWIFT_BIC',conf:.7,re:/\b(?:swift|bic)\b\s*[:=]?\s*([A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?)\b/gi,group:1},
+  {type:'BANK_ACCOUNT',conf:.7,re:/\b(?:a\/c|acct?|account)\s*(?:no\.?|number|#)?\s*[:=]?\s*(\d{9,18})\b/gi,group:1},
+  {type:'UPI_ID',conf:.8,re:/\b[\w.\-]{2,64}@(?:oksbi|okhdfcbank|okicici|okaxis|paytm|ybl|ibl|axl|apl|upi|hdfcbank|sbi)\b/gi},
+  {type:'CRYPTO_ETH',conf:.85,re:/\b0x[a-fA-F0-9]{40}\b/g},
+  {type:'CRYPTO_BTC',conf:.8,re:/\b(?:bc1[a-z0-9]{25,39}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})\b/g},
+  {type:'IN_AADHAAR',conf:.9,re:/(?<!\d)[2-9]\d{3}\s?\d{4}\s?\d{4}(?!\d)/g,validate:verhoeffValid},
+  {type:'IN_PAN',conf:.9,re:/\b[A-Z]{5}\d{4}[A-Z]\b/g},
+  {type:'IN_GSTIN',conf:.85,re:/\b\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9]Z[A-Z0-9]\b/g},
+  {type:'IN_VOTER_ID',conf:.7,re:/\b[A-Z]{3}[0-9]{7}\b/g},
+  {type:'US_SSN',conf:.85,re:/\b\d{3}-\d{2}-\d{4}\b/g},
+  {type:'IN_PASSPORT',conf:.6,re:/\b[A-PR-WYa-pr-wy][0-9]\s?[0-9]{6}\b/g},
+  {type:'EMAIL_ADDRESS',conf:.95,re:/\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b/g},
+  {type:'DOB',conf:.65,re:/\b(?:dob|date\s?of\s?birth|born(?:\s?on)?)\b\s*[:=]?\s*(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/gi,group:1},
+  {type:'PHONE_NUMBER',conf:.6,re:/(?<!\d)(?:\+?\d{1,3}[\s.\-]?)?(?:\(?\d{2,4}\)?[\s.\-]?)?\d{3,4}[\s.\-]?\d{4}(?!\d)/g},
+  {type:'MAC_ADDRESS',conf:.6,re:/\b(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b/g},
+  {type:'IP_ADDRESS',conf:.8,re:/\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g},
+];
+
+const WEIGHTS={PRIVATE_KEY:1,AWS_ACCESS_KEY:1,PASSWORD:1,SECRET:1,OTP:.95,PIN:.9,CREDIT_CARD:1,IN_AADHAAR:1,US_SSN:1,CVV:.95,GITHUB_TOKEN:.95,GOOGLE_API_KEY:.95,API_SECRET_KEY:.95,SLACK_TOKEN:.9,IN_PAN:.9,IN_PASSPORT:.9,IBAN:.9,IN_GSTIN:.8,BANK_ACCOUNT:.85,CRYPTO_ETH:.85,CRYPTO_BTC:.85,JWT:.85,IN_IFSC:.75,UPI_ID:.8,SWIFT_BIC:.7,IN_VOTER_ID:.7,DOB:.6,PHONE_NUMBER:.55,EMAIL_ADDRESS:.45,MAC_ADDRESS:.45,IP_ADDRESS:.35};
+function maskPreview(v){const t=String(v).replace(/\s+/g,' ').trim();return t.length<=4?'•'.repeat(Math.max(1,t.length)):'•'.repeat(Math.min(6,t.length-4))+t.slice(-4);}
+function weight(t){return WEIGHTS[t]??.3;}
+function levelFor(s){return s>=80?'critical':s>=55?'high':s>=25?'medium':'low';}
+function computeRisk(ents){
+  if(!ents.length)return 0;
+  const w=ents.map(e=>weight(e.type)*e.confidence).sort((a,b)=>b-a);
+  const severity=w[0]*70;
+  const remaining=w.slice(1).reduce((a,b)=>a+b,0);
+  const volume=(1-Math.exp(-remaining))*30;
+  return Math.round(Math.min(100,severity+volume)*10)/10;
+}
+function detect(text){
+  let ents=[];
+  for(const p of PATTERNS){
+    p.re.lastIndex=0;let m;
+    while((m=p.re.exec(text))!==null){
+      if(m.index===p.re.lastIndex)p.re.lastIndex++;
+      let val=m[0],idx=m.index;
+      if(p.group){val=m[p.group];if(val==null)continue;idx=m.index+m[0].indexOf(val);}
+      if(val.replace(/[^A-Za-z]/g,'')==='REDACTED')continue;
+      if(p.validate&&!p.validate(val))continue;
+      ents.push({type:p.type,text:val,start:idx,end:idx+val.length,confidence:p.conf});
+    }
+  }
+  // resolve overlaps: keep the highest-severity finding for any overlapping region
+  ents.sort((a,b)=>(weight(b.type)*b.confidence)-(weight(a.type)*a.confidence)||(b.end-b.start)-(a.end-a.start)||a.start-b.start);
+  const kept=[];
+  for(const e of ents){if(kept.some(k=>e.start<k.end&&k.start<e.end))continue;kept.push(e);}
+  return kept.sort((a,b)=>a.start-b.start);
+}
+function redact(text,ents){let r=text;[...ents].sort((a,b)=>b.start-a.start).forEach(e=>{r=r.slice(0,e.start)+'['+e.type+']'+r.slice(e.end);});return r;}
+function summarize(ents){const m={};ents.forEach(e=>{(m[e.type]??=({type:e.type,count:0,max:0}));m[e.type].count++;m[e.type].max=Math.max(m[e.type].max,e.confidence);});return Object.values(m).sort((a,b)=>b.count-a.count);}
+const FRIENDLY={PRIVATE_KEY:'private key',AWS_ACCESS_KEY:'AWS access key',GITHUB_TOKEN:'GitHub token',GOOGLE_API_KEY:'Google API key',SLACK_TOKEN:'Slack token',API_SECRET_KEY:'API secret key',JWT:'JWT token',PASSWORD:'password',SECRET:'secret / API key',OTP:'OTP code',PIN:'PIN',CREDIT_CARD:'card number',CVV:'card CVV',IBAN:'bank account (IBAN)',IN_IFSC:'IFSC code',SWIFT_BIC:'SWIFT/BIC',BANK_ACCOUNT:'bank account no.',UPI_ID:'UPI ID',CRYPTO_ETH:'crypto wallet (ETH)',CRYPTO_BTC:'crypto wallet (BTC)',IN_AADHAAR:'Aadhaar number',IN_PAN:'PAN (tax ID)',IN_GSTIN:'GSTIN',IN_VOTER_ID:'voter ID',US_SSN:'SSN',IN_PASSPORT:'passport number',EMAIL_ADDRESS:'email address',DOB:'date of birth',PHONE_NUMBER:'phone number',MAC_ADDRESS:'MAC address',IP_ADDRESS:'IP address'};
+function explain(summary,level){
+  if(!summary.length)return 'No personal data was detected in this text.';
+  const parts=summary.map(i=>i.count+'× '+(FRIENDLY[i.type]||i.type));
+  return 'This text contains '+parts.join(', ')+'. Overall privacy risk is '+level.toUpperCase()+'. '+
+    'Consider redacting or anonymising these values before sharing or storing them, and confirm you have a lawful basis (consent or contract) to process them.';
+}
+function scan(text){const ents=detect(text);const summary=summarize(ents);const score=computeRisk(ents);const level=levelFor(score);
+  return {ents,summary,score,level,redacted:redact(text,ents),explanation:explain(summary,level),chars:text.length,when:new Date()};}
+
+// --- compliance subset for the printable report ---
+const COMPLIANCE={
+  IN_AADHAAR:{label:'Aadhaar number',sev:'critical',gdpr:'Art. 9, Art. 32',dpdp:'S. 8; Aadhaar Act S. 29',rec:'Never store in plain text; mask to last 4, encrypt, restrict access.'},
+  IN_PAN:{label:'PAN (tax ID)',sev:'high',gdpr:'Art. 6, Art. 32',dpdp:'S. 4, S. 8',rec:'Collect only when tax-required; mask and encrypt at rest.'},
+  IN_PASSPORT:{label:'Passport number',sev:'high',gdpr:'Art. 9, Art. 32',dpdp:'S. 8',rec:'Treat as government ID; encrypt and limit retention.'},
+  CREDIT_CARD:{label:'Payment card number',sev:'critical',gdpr:'Art. 32',dpdp:'S. 8',rec:'Do not store; tokenise via a PCI-DSS processor.'},
+  EMAIL_ADDRESS:{label:'Email address',sev:'medium',gdpr:'Art. 6, Art. 21',dpdp:'S. 6, S. 12',rec:'Process on a lawful basis; honour erasure requests.'},
+  PHONE_NUMBER:{label:'Phone number',sev:'medium',gdpr:'Art. 6',dpdp:'S. 6',rec:'Collect with consent; avoid purpose creep.'},
+  IP_ADDRESS:{label:'IP address',sev:'low',gdpr:'Art. 4(1), Recital 30',dpdp:'S. 4',rec:'Anonymise/truncate in logs where possible.'},
+};
+function ruleFor(t){return COMPLIANCE[t]||{label:'Personal data',sev:'medium',gdpr:'Art. 5, Art. 6',dpdp:'S. 4, S. 6',rec:'Confirm a lawful basis and minimise before sharing.'};}
+
+// ===========================================================================
+// In-memory store seeded with demo scans (so the dashboard looks alive).
+// ===========================================================================
+const PROFILES=[['EMAIL_ADDRESS'],['EMAIL_ADDRESS','PHONE_NUMBER'],['IN_AADHAAR','IN_PAN'],
+  ['CREDIT_CARD','EMAIL_ADDRESS'],['PHONE_NUMBER'],['IP_ADDRESS'],['IN_PASSPORT'],[]];
+const store={scans:[]};
+function seed(){
+  const now=Date.now();
+  for(let i=0;i<48;i++){
+    const prof=PROFILES[Math.floor(Math.random()*PROFILES.length)];
+    const summary=prof.map(t=>({type:t,count:1+Math.floor(Math.random()*3),max:.6+Math.random()*.35}));
+    const ents=[];summary.forEach(s=>{for(let k=0;k<s.count;k++)ents.push({type:s.type,confidence:s.max});});
+    const score=computeRisk(ents);
+    store.scans.push({summary,score,level:levelFor(score),count:ents.length,
+      when:new Date(now-Math.floor(Math.random()*13*864e5)-Math.floor(Math.random()*864e5))});
+  }
+}
+function addScan(r){store.scans.push({summary:r.summary.map(s=>({type:s.type,count:s.count,max:s.max})),score:r.score,level:r.level,count:r.ents.length,when:r.when});}
+
+function dashboardStats(){
+  const s=store.scans, total=s.length;
+  const high=s.filter(x=>x.level==='high'||x.level==='critical').length;
+  const avg=total?Math.round(s.reduce((a,b)=>a+b.score,0)/total*10)/10:0;
+  const breakdown={low:0,medium:0,high:0,critical:0};s.forEach(x=>breakdown[x.level]++);
+  const piiMap={};s.forEach(x=>x.summary.forEach(it=>{piiMap[it.type]=(piiMap[it.type]||0)+it.count;}));
+  const top=Object.entries(piiMap).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([type,count])=>({type,count}));
+  const today=new Date();today.setHours(0,0,0,0);
+  const trend=[];
+  for(let off=13;off>=0;off--){
+    const day=new Date(today-off*864e5);const key=day.toISOString().slice(0,10);
+    const dayScans=s.filter(x=>x.when.toISOString().slice(0,10)===key);
+    trend.push({date:key,scans:dayScans.length,avg:dayScans.length?Math.round(dayScans.reduce((a,b)=>a+b.score,0)/dayScans.length*10)/10:0});
+  }
+  return {total,high,avg,posture:Math.round((100-avg)*10)/10,
+    compliance:total?Math.round((1-high/total)*1000)/10:100,breakdown,top,trend};
+}
+
+// ===========================================================================
+// Views
+// ===========================================================================
+const app=document.getElementById('app');
+const state={auth:false,view:'dashboard',email:'demo@northstar.dev',result:null};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function logoSVG(size){return `<svg width="${size}" height="${size}" viewBox="0 0 32 32" fill="none">
+  <path d="M16 2 5 6.5V15c0 7 4.6 11.6 11 14.8C22.4 26.6 27 22 27 15V6.5L16 2Z" fill="rgba(99,102,241,.25)" stroke="#6366f1" stroke-width="1.2"/>
+  <path d="M11 16.2 14.5 19.7 21 12.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+
+function render(){ state.auth ? renderShell() : renderLogin(); }
+
+function renderLogin(){
+  app.innerHTML=`<div class="auth-center"><div class="auth-card card fade-in">
+    <div class="row" style="gap:10px;margin-bottom:20px">${logoSVG(30)}
+      <div><h1 style="font-size:18px">North Star</h1><p class="muted">Detect &amp; redact sensitive data</p></div></div>
+    <div class="stack">
+      <div><label>Email</label><input id="email" type="email" value="demo@northstar.dev"></div>
+      <div><label>Password</label><input id="pw" type="password" value="DemoPass123"></div>
+      <button class="btn-primary" id="signin">Sign in</button>
+    </div>
+    <p class="muted" style="margin-top:16px;text-align:center">Preview build — any credentials work. Click <b>Sign in</b>.</p>
+  </div></div>`;
+  document.getElementById('signin').onclick=()=>{state.email=document.getElementById('email').value||state.email;state.auth=true;render();};
+}
+
+function renderShell(){
+  const tabs=[['dashboard','Dashboard'],['scan','New Scan'],['guard','Type Guard ⭐']];
+  app.innerHTML=`<div class="app-shell">
+    <nav class="navbar">
+      <div class="brand">${logoSVG(26)} North Star</div>
+      <div class="nav-tabs">${tabs.map(([id,l])=>`<button class="nav-tab ${state.view===id?'active':''}" data-tab="${id}">${l}</button>`).join('')}</div>
+      <div class="nav-right"><span class="nav-user">${esc(state.email)} · <b>analyst</b></span><button class="btn-ghost" id="logout">Sign out</button></div>
+    </nav>
+    <div class="container" id="page"></div>
+  </div>`;
+  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{state.view=b.dataset.tab;render();});
+  document.getElementById('logout').onclick=()=>{state.auth=false;render();};
+  if(state.view==='dashboard')renderDashboard();
+  else if(state.view==='guard')renderGuard();
+  else renderScan();
+}
+
+function renderGuard(){
+  document.getElementById('page').innerHTML=`<div class="fade-in">
+    <h1>Type Guard — the signature feature</h1>
+    <p class="subtitle">This simulates what the Chrome extension does inside <b>any</b> text box — including AI chatbots like ChatGPT, Claude &amp; Gemini. Start typing something sensitive below (an Aadhaar or card number) and watch it warn you <b>before you send</b>.</p>
+    <div class="card" style="max-width:640px">
+      <label>💬 Pretend this is an AI chat box</label>
+      <div id="chatwrap" style="position:relative">
+        <textarea id="chat" style="min-height:120px" placeholder="Try: My Aadhaar is 2341 2345 6783 and card 4111 1111 1111 1111…"></textarea>
+        <div id="guardtip"></div>
+      </div>
+      <div class="row between" style="margin-top:10px">
+        <span class="muted" id="guardstat">Local detection — nothing leaves your browser.</span>
+        <button class="btn-primary" id="send">Send ▸</button>
+      </div>
+    </div>
+  </div>`;
+  const ta=document.getElementById('chat'), tip=document.getElementById('guardtip'), stat=document.getElementById('guardstat');
+  let timer;
+  function check(){
+    const r=scan(ta.value);
+    if(r.ents.length){
+      const items=r.ents.slice(0,10).map(e=>`<div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">${(FRIENDLY[e.type]||e.type)}</span><span style="font-family:var(--mono);color:var(--risk-high)">${maskPreview(e.text)}</span></div>`).join('');
+      const more=r.ents.length>10?`<div class="muted" style="font-size:11px">+ ${r.ents.length-10} more…</div>`:'';
+      const cred=r.ents.some(e=>CREDS.includes(e.type));
+      const banner=cred?`<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:8px;padding:8px 10px;font-size:12px;margin-bottom:8px">🔴 Never paste passwords or secret keys into a website or chatbot. Remove them before sending.</div>`:'';
+      tip.innerHTML=`<div class="badge risk-${r.level}" style="margin-bottom:8px">⚠ ${r.level} — ${r.ents.length} sensitive item(s) detected</div>
+        ${banner}
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;max-height:150px;overflow:auto">${items}${more}</div>
+        <div class="row"><button class="btn-primary" id="redact" style="padding:6px 12px">Redact all</button></div>`;
+      tip.style.cssText='margin-top:10px;padding:12px;border:1px solid var(--border);border-left:3px solid var(--risk-'+r.level+');border-radius:8px;background:var(--bg-elev-2)';
+      document.getElementById('redact').onclick=()=>{ta.value=r.redacted;check();};
+    } else { tip.innerHTML=''; tip.style.cssText=''; }
+  }
+  ta.oninput=()=>{clearTimeout(timer);timer=setTimeout(check,120);};
+  document.getElementById('send').onclick=()=>{
+    const r=scan(ta.value);
+    stat.textContent=r.ents.length?`⛔ Blocked — ${r.ents.length} PII item(s) found. Redact before sending.`:'✅ Sent — no sensitive data detected.';
+    stat.style.color=r.ents.length?'var(--risk-critical)':'var(--risk-low)';
+  };
+}
+
+function trendSVG(data){
+  const W=720,H=240,pad={l:34,r:14,t:16,b:26},pw=W-pad.l-pad.r,ph=H-pad.t-pad.b,n=data.length;
+  const maxS=Math.max(1,...data.map(d=>d.scans));
+  const x=i=>pad.l+(n<=1?pw/2:i/(n-1)*pw), yR=r=>pad.t+(1-Math.min(100,r)/100)*ph, base=pad.t+ph;
+  const line=data.map((d,i)=>`${x(i)},${yR(d.avg)}`).join(' ');
+  const area=`M ${x(0)},${base} L ${data.map((d,i)=>`${x(i)},${yR(d.avg)}`).join(' L ')} L ${x(n-1)},${base} Z`;
+  const grid=[0,25,50,75,100].map(l=>`<line class="grid-line" x1="${pad.l}" y1="${yR(l)}" x2="${W-pad.r}" y2="${yR(l)}"/><text class="axis-label" x="${pad.l-6}" y="${yR(l)+3}" text-anchor="end">${l}</text>`).join('');
+  const bars=data.map((d,i)=>{const h=d.scans/maxS*ph,bw=Math.max(3,pw/n-6);return `<rect class="vol-bar" x="${x(i)-bw/2}" y="${base-h}" width="${bw}" height="${h}" rx="2"><title>${d.date}: ${d.scans} scan(s), avg ${d.avg}</title></rect>`;}).join('');
+  const dots=data.map((d,i)=>`<circle class="risk-dot" cx="${x(i)}" cy="${yR(d.avg)}" r="2.5"/>`).join('');
+  const ticks=[0,Math.floor((n-1)/2),n-1].map(i=>`<text class="axis-label" x="${x(i)}" y="${H-6}" text-anchor="middle">${data[i].date.slice(5)}</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="trend-chart"><defs><linearGradient id="ra" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="var(--accent)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${bars}<path d="${area}" fill="url(#ra)"/><polyline class="risk-line" fill="none" points="${line}"/>${dots}${ticks}</svg>`;
+}
+
+function tone(v){return v>=75?'good':v>=50?'warn':'bad';}
+
+function renderDashboard(){
+  const d=dashboardStats();
+  const maxPii=Math.max(1,...d.top.map(t=>t.count));
+  const totalB=Math.max(1,d.breakdown.low+d.breakdown.medium+d.breakdown.high+d.breakdown.critical);
+  document.getElementById('page').innerHTML=`<div class="stack fade-in">
+    <div class="row between"><div><h1>Dashboard</h1><p class="subtitle" style="margin:0">Privacy posture across the organization.</p></div>
+      <button class="btn-primary" id="newscan">New scan</button></div>
+    <div class="stat-grid">
+      ${statCard('Total scans',d.total,'all time','default')}
+      ${statCard('High-risk scans',d.high,'high + critical',d.high>0?'bad':'good')}
+      ${statCard('Privacy posture',d.posture,'100 = pristine',tone(d.posture))}
+      ${statCard('Compliance score',d.compliance+'%','scans without high risk',tone(d.compliance))}
+    </div>
+    <div class="grid-2">
+      <div class="card"><h2>Risk trend (14 days)</h2>${trendSVG(d.trend)}
+        <div class="legend"><span class="legend-item"><span class="legend-swatch swatch-line"></span> Avg risk score</span>
+        <span class="legend-item"><span class="legend-swatch swatch-bar"></span> Scan volume</span></div></div>
+      <div class="stack">
+        <div class="card"><h2>Top detected PII</h2>${d.top.length?`<div class="bar-list">${d.top.map(t=>`<div class="bar-row"><span class="bar-label">${t.type}</span><div class="bar-track"><div class="bar-fill" style="width:${t.count/maxPii*100}%"></div></div><span class="bar-count">${t.count}</span></div>`).join('')}</div>`:'<p class="muted">No PII yet.</p>'}</div>
+        <div class="card"><h2>Risk breakdown</h2>
+          <div class="segbar">${['low','medium','high','critical'].map(l=>d.breakdown[l]>0?`<div class="segbar-seg risk-${l}-bg" style="width:${d.breakdown[l]/totalB*100}%" title="${l}: ${d.breakdown[l]}"></div>`:'').join('')}</div>
+          <div class="chips" style="margin-top:12px">${['low','medium','high','critical'].map(l=>`<span class="chip"><span class="badge risk-${l}" style="padding:1px 7px">${l}</span> <b>${d.breakdown[l]}</b></span>`).join('')}</div>
+        </div>
+      </div>
+    </div></div>`;
+  document.getElementById('newscan').onclick=()=>{state.view='scan';render();};
+}
+function statCard(label,value,sub,t){return `<div class="stat-card tone-${t}"><div class="stat-label">${label}</div><div class="stat-value">${value}</div><div class="stat-sub">${sub}</div></div>`;}
+
+const SAMPLE=`Hi, I'm Ravi Kumar. My Aadhaar is 2341 2345 6783 and PAN ABCDE1234F.\nReach me at ravi.kumar@example.com or +91 98765 43210.\nCard 4111 1111 1111 1111, server IP 192.168.1.42.`;
+
+function renderScan(){
+  document.getElementById('page').innerHTML=`<div class="fade-in">
+    <h1>Scan text for sensitive data</h1>
+    <p class="subtitle">Paste any text. North Star detects PII, scores the privacy risk, and shows a redacted version.</p>
+    <div class="grid-2">
+      <div class="card stack">
+        <div><label>Input text</label><textarea id="scanin">${esc(SAMPLE)}</textarea></div>
+        <div class="row between"><span class="muted" id="charc"></span>
+          <button class="btn-primary" id="runscan">Scan for PII</button></div>
+      </div>
+      <div id="resultpane"><div class="card" style="display:grid;place-items:center;min-height:220px"><p class="muted">Results will appear here after a scan.</p></div></div>
+    </div></div>`;
+  const ta=document.getElementById('scanin'),cc=document.getElementById('charc');
+  const upd=()=>cc.textContent=ta.value.length.toLocaleString()+' characters';upd();ta.oninput=upd;
+  document.getElementById('runscan').onclick=function(){
+    const btn=this;btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+    setTimeout(()=>{const r=scan(ta.value);state.result=r;addScan(r);renderResult(r);btn.disabled=false;btn.textContent='Scan for PII';},450);
+  };
+  if(state.result)renderResult(state.result);
+}
+
+function renderResult(r){
+  const pane=document.getElementById('resultpane');if(!pane)return;
+  const redHTML=r.redacted.split(/(\[[A-Z_]+\])/g).map(p=>/^\[[A-Z_]+\]$/.test(p)?`<mark>${p}</mark>`:esc(p)).join('');
+  pane.innerHTML=`<div class="stack fade-in">
+    <div class="card stack">
+      <div class="row between"><div><div class="score-num">${r.score}</div><div class="score-cap">Risk score / 100</div></div>
+        <span class="badge risk-${r.level}">${r.level}</span></div>
+      <button class="btn-ghost" id="dlreport">⬇ Download PDF audit report</button>
+      ${r.summary.length?`<div><h2>Detected PII (${r.ents.length})</h2><div class="chips">${r.summary.map(f=>`<span class="chip">${f.type} <b>×${f.count}</b></span>`).join('')}</div></div>`:'<p class="muted">No personal data detected.</p>'}
+    </div>
+    ${r.explanation?`<div class="card"><h2>What this means</h2><p class="explanation">${esc(r.explanation)}</p></div>`:''}
+    <div class="card"><h2>Redacted output</h2><div class="redacted">${redHTML}</div></div>
+  </div>`;
+  const dl=document.getElementById('dlreport');if(dl)dl.onclick=()=>openReport(r);
+}
+
+function openReport(r){
+  const rows=r.summary.map(s=>{const c=ruleFor(s.type);return `<tr><td>${c.label}</td><td><b style="color:${{critical:'#ef4444',high:'#f97316',medium:'#eab308',low:'#22c55e'}[c.sev]}">${c.sev.toUpperCase()}</b></td><td>${c.gdpr}</td><td>${c.dpdp}</td></tr>`;}).join('');
+  const inv=r.summary.map(s=>`<tr><td>${ruleFor(s.type).label} (${s.type})</td><td>${s.count}</td><td>${Math.round(s.max*100)}%</td></tr>`).join('')||'<tr><td>None detected</td><td>0</td><td>—</td></tr>';
+  const actions=[...new Set(r.summary.map(s=>ruleFor(s.type).rec))];
+  actions.push('Record the lawful basis and retention period, and log this assessment in your audit trail.');
+  const w=window.open('','_blank');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Privacy Audit Report</title>
+  <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#11131a;max-width:780px;margin:32px auto;padding:0 24px}
+  h1{font-size:24px;margin:0}h2{color:#6366f1;font-size:15px;border-bottom:2px solid #6366f1;padding-bottom:4px;margin-top:26px}
+  .sub{color:#54607a;font-size:12px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+  th{background:#6366f1;color:#fff;text-align:left;padding:6px 8px}td{border:1px solid #e3e6ec;padding:6px 8px}
+  tr:nth-child(even) td{background:#f5f6fa}.foot{color:#8a93a6;font-size:10px;margin-top:24px;border-top:1px solid #e3e6ec;padding-top:8px}
+  ol{font-size:13px;line-height:1.6}@media print{.noprint{display:none}}</style></head><body>
+  <p class="sub">North Star</p><h1>Privacy Audit Report</h1>
+  <p class="sub">Generated ${r.when.toISOString().slice(0,16).replace('T',' ')} UTC · Owner ${esc(state.email)}</p>
+  <h2>Executive Summary</h2><p style="font-size:13px">${r.ents.length?`This scan detected <b>${r.ents.length}</b> instance(s) of personal data across <b>${r.summary.length}</b> type(s). Overall risk is <b>${r.level.toUpperCase()}</b> (score ${r.score}/100). Remediate before sharing or storing.`:'No personal data detected. Privacy risk is low.'}</p>
+  <h2>Risk Summary</h2><table><tr><th>Metric</th><th>Value</th></tr><tr><td>Risk score</td><td>${r.score} / 100</td></tr><tr><td>Risk level</td><td>${r.level.toUpperCase()}</td></tr><tr><td>PII instances</td><td>${r.ents.length}</td></tr><tr><td>Characters scanned</td><td>${r.chars}</td></tr></table>
+  <h2>PII Inventory</h2><table><tr><th>Data type</th><th>Count</th><th>Max confidence</th></tr>${inv}</table>
+  <h2>Compliance Findings (GDPR &amp; India DPDP)</h2><table><tr><th>Data type</th><th>Severity</th><th>GDPR</th><th>India DPDP</th></tr>${rows||'<tr><td colspan=4>No obligations triggered</td></tr>'}</table>
+  <h2>Recommended Actions</h2><ol>${actions.map(a=>`<li>${a}</li>`).join('')}</ol>
+  <p class="foot">Generated automatically from scan metadata for decision-support only. Not legal advice.</p>
+  <button class="noprint" onclick="window.print()" style="margin-top:20px;padding:10px 16px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer">Print / Save as PDF</button>
+  </body></html>`);w.document.close();
+}
+
+seed();render();
+</script>
+</body>
+</html>

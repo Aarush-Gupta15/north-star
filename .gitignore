@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Node
+node_modules/
+dist/
+.vite/
+*.local
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Packaged build artifacts at repo root (keep source in extension/ & extension-personal/)
+/north-star-personal-v*.zip
+/north-star-privacy-guard-v*.zip
+/north-star-privacy-guard-v0.3.0/
+/north-star-personal/
+/ziC7JebG

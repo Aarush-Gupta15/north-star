@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "North Star \u2014 Privacy Guard",
+  "version": "1.5.1",
+  "description": "Warns you before you type or paste sensitive data (Aadhaar, PAN, cards, passwords, API keys\u2026) into any text box, including AI chatbots. 100% local \u2014 nothing ever leaves your browser.",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "storage",
+    "notifications"
+  ],
+  "action": {
+    "default_title": "North Star \u2014 scan this page",
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/engine.js",
+        "src/input-guard.js",
+        "src/content.js"
+      ],
+      "css": [
+        "src/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "src/options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

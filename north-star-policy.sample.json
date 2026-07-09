@@ -1,0 +1,25 @@
+{
+  "northStarPolicy": 1,
+  "_comment": "Sample North Star company policy. Import via extension Options - Import policy. Then paste the sample text from the chat to see it fire.",
+  "customRules": {
+    "terms": [
+      "Project Falcon",
+      "acme-internal.com",
+      "Q3 Roadmap",
+      "Internal Use Only"
+    ],
+    "keywords": [
+      "employee id",
+      "emp id",
+      "salary",
+      "api key",
+      "access token",
+      "db password"
+    ],
+    "regexes": [
+      "EMP\\d{6}",
+      "ACME-[A-Z0-9]{16}",
+      "PRJ-\\d{4}"
+    ]
+  }
+}

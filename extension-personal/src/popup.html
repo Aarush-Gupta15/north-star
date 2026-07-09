@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="hd">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2 5 6.5V15c0 7 4.6 11.6 11 14.8C22.4 26.6 27 22 27 15V6.5L16 2Z" fill="rgba(99,102,241,.25)" stroke="#6366f1" stroke-width="1.2"/>
+        <path d="M11 16.2 14.5 19.7 21 12.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      North Star
+    </div>
+    <button id="opts" class="link" title="Settings">⚙</button>
+  </header>
+
+  <div id="siteRow" class="siteRow" hidden>
+    <div class="siteInfo">
+      <div class="siteLabel">Protect this site</div>
+      <div id="siteHost" class="siteHost muted"></div>
+    </div>
+    <button id="siteToggle" class="switch" role="switch" aria-checked="true"><span class="knob"></span></button>
+  </div>
+
+  <button id="scanPage" class="primary">Scan this page</button>
+  <div id="pageStatus" class="status muted">Checking this page…</div>
+
+  <div class="divider"><span>or scan text</span></div>
+
+  <textarea id="text" placeholder="Paste text to check for PII…"></textarea>
+  <button id="scanText" class="ghost">Scan text</button>
+
+  <div id="result"></div>
+
+  <footer class="ft muted">Detection runs locally. Raw text never leaves your browser.</footer>
+
+  <script src="engine.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

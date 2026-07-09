@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "properties": {
+    "reportIncidents": {
+      "title": "Report policy incidents to management",
+      "description": "When true, if an employee sends flagged sensitive data despite a warning, a MASKED incident (metadata + last-4 snippet, never raw values) is posted to the company backend. Enforced; users cannot disable it.",
+      "type": "boolean"
+    },
+    "apiUrl": {
+      "title": "North Star backend API base URL",
+      "description": "e.g. https://northstar.yourcompany.com/api/v1",
+      "type": "string"
+    },
+    "token": {
+      "title": "Reporting access token",
+      "description": "Token used to authenticate incident reports to the backend.",
+      "type": "string"
+    },
+    "customRules": {
+      "title": "Organisation sensitive-data policy",
+      "description": "Rules pushed by IT/admin. Enforced for all users and merged with their personal rules. Employees cannot disable these.",
+      "type": "object",
+      "properties": {
+        "terms": {
+          "title": "Words / phrases to always flag",
+          "description": "Exact matches flagged wherever they appear (codenames, internal domains, classification labels).",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "keywords": {
+          "title": "Label keywords",
+          "description": "Flag whatever value follows the keyword, e.g. 'employee id' flags the value in 'employee id 48213'.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "regexes": {
+          "title": "Regex patterns",
+          "description": "Regular expressions for structured internal IDs / key formats.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

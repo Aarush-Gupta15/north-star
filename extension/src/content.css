@@ -1,0 +1,19 @@
+/* Inline PII highlight marks injected into the page DOM.
+   Uses !important so page stylesheets can't wash out the highlight. */
+mark.ns-pii {
+  background: rgba(99, 102, 241, 0.28) !important;
+  color: inherit !important;
+  border-bottom: 2px solid #6366f1 !important;
+  border-radius: 3px !important;
+  padding: 0 2px !important;
+  cursor: help !important;
+}
+
+/* High-severity identifiers get a red emphasis. */
+mark.ns-pii[data-type="IN_AADHAAR"],
+mark.ns-pii[data-type="CREDIT_CARD"],
+mark.ns-pii[data-type="IN_PAN"],
+mark.ns-pii[data-type="IN_PASSPORT"] {
+  background: rgba(239, 68, 68, 0.28) !important;
+  border-bottom-color: #ef4444 !important;
+}

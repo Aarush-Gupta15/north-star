@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>North Star — Settings</title>
+  <link rel="stylesheet" href="popup.css" />
+  <style>
+    body { width: 460px; }
+    h1 { font-size: 17px; margin: 0 0 4px; }
+    .sub { color: var(--faint); font-size: 12px; margin: 0 0 18px; }
+    label { display: block; font-size: 12px; color: var(--dim); margin: 14px 0 6px; font-weight: 500; }
+    input[type="text"], input[type="password"] {
+      width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 11px; font-size: 13px;
+    }
+    input:focus { outline: none; border-color: var(--accent); }
+    .toggle { display: flex; align-items: center; gap: 9px; margin-top: 16px; }
+    .toggle input { width: auto; }
+    .hint { color: var(--faint); font-size: 11px; margin-top: 5px; }
+    #saved { color: var(--low); font-size: 12px; margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>North Star — Settings</h1>
+  <p class="sub">Optional: connect to your North Star backend to sync scan summaries to the dashboard. Detection always runs locally regardless.</p>
+
+  <label for="apiUrl">API base URL</label>
+  <input type="text" id="apiUrl" placeholder="http://localhost:8000/api/v1" />
+  <div class="hint">Your North Star backend's API base (no trailing slash needed).</div>
+
+  <label for="token">Access token (JWT)</label>
+  <input type="password" id="token" placeholder="Paste the access_token from logging in" />
+  <div class="hint">Get this by signing in to North Star and copying the access token. Stored only in your browser.</div>
+
+  <h1 style="font-size:14px;margin:22px 0 2px;">Protection</h1>
+  <div class="toggle">
+    <input type="checkbox" id="typeGuard" />
+    <label for="typeGuard" style="margin: 0;">Warn me while typing (real-time guard for any text box, incl. AI chatbots)</label>
+  </div>
+  <div class="toggle">
+    <input type="checkbox" id="blockSend" />
+    <label for="blockSend" style="margin: 0;">Block Enter/send while sensitive data is present (stricter)</label>
+  </div>
+  <div class="toggle">
+    <input type="checkbox" id="autoScan" />
+    <label for="autoScan" style="margin: 0;">Auto-scan whole pages as they load</label>
+  </div>
+  <div class="toggle">
+    <input type="checkbox" id="reportIncidents" />
+    <label for="reportIncidents" style="margin: 0;">Report incidents to management (sends a masked summary to the backend when sensitive data is sent despite a warning)</label>
+  </div>
+  <div class="hint">Requires the API URL + token above. Companies can enforce this centrally so employees can't turn it off (see the enterprise guide).</div>
+
+  <h1 style="font-size:14px;margin:24px 0 2px;">Custom sensitive terms</h1>
+  <p class="sub" style="margin:0 0 6px;">Add your organisation's own terms. Detection stays 100% local. One entry per line.</p>
+
+  <div id="managedNote" style="display:none;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.4);color:#c7d2fe;border-radius:8px;padding:9px 11px;font-size:12px;margin-bottom:10px">
+    🏢 <b>Company policy active.</b> Your organisation has enforced <span id="managedCount">0</span> rule(s) (shown below, locked). Your own rules are added on top.
+  </div>
+
+  <div style="font-size:12px;color:var(--dim);margin-bottom:6px">Quick start — apply a preset, then edit &amp; Save:</div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="packs">
+    <button class="ghost pack" data-pack="general" style="width:auto;padding:6px 12px">🏢 General company</button>
+    <button class="ghost pack" data-pack="dev" style="width:auto;padding:6px 12px">💻 Software / Dev</button>
+    <button class="ghost pack" data-pack="finance" style="width:auto;padding:6px 12px">💰 Finance</button>
+    <button class="ghost pack" data-pack="healthcare" style="width:auto;padding:6px 12px">🏥 Healthcare</button>
+  </div>
+
+  <label for="terms">Words / phrases to always flag</label>
+  <textarea id="terms" rows="3" placeholder="Project Falcon&#10;acme-internal.com&#10;Confidential-2026"></textarea>
+  <div class="hint">Exact matches are flagged wherever they appear (e.g. codenames, internal domains).</div>
+
+  <label for="keywords">Label keywords — flag whatever follows</label>
+  <textarea id="keywords" rows="3" placeholder="employee id&#10;emp id&#10;internal key"></textarea>
+  <div class="hint">e.g. adding “employee id” flags the value in “employee id 48213”.</div>
+
+  <label for="regexes">Regex patterns <span style="color:var(--faint)">(advanced)</span></label>
+  <textarea id="regexes" rows="3" placeholder="ACME-[A-Z0-9]{16}&#10;EMP\\d{6}"></textarea>
+  <div class="hint">One regular expression per line, for structured internal IDs / keys. Invalid patterns are ignored.</div>
+
+  <div style="margin-top: 22px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <button id="save" class="primary" style="width: auto; padding: 9px 20px;">Save</button>
+    <button id="export" class="ghost" style="width:auto;padding:9px 14px">⬇ Export policy</button>
+    <button id="importBtn" class="ghost" style="width:auto;padding:9px 14px">⬆ Import policy</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+    <span id="saved"></span>
+  </div>
+  <div class="hint">Admins: build a rule set, <b>Export</b> a <code>north-star-policy.json</code>, and share it — teammates click <b>Import</b>. (Or push it org-wide via Chrome managed policy — see the enterprise guide.)</div>
+
+  <label for="tester" style="margin-top:22px">Try it — paste text to test your rules</label>
+  <textarea id="tester" rows="3" placeholder="Paste sample text here after saving…"></textarea>
+  <div id="testout" class="hint"></div>
+
+  <script src="engine.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
